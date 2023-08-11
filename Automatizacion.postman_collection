@@ -1,0 +1,2206 @@
+{
+	"info": {
+		"_postman_id": "2aa66ba6-5a6b-4991-9ad0-8ed770bc5f7a",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1343782",
+		"_collection_link": "https://red-resonance-816713.postman.co/workspace/NovoPayment~6d7a4763-8fae-404f-b0c2-cc441fc7bfc6/collection/1343782-2aa66ba6-5a6b-4991-9ad0-8ed770bc5f7a?action=share&creator=1343782&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "00_Create token",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vUsurname= pm.iterationData.get(\"01_vuser\");\r",
+									"var vpassword= pm.iterationData.get(\"01_vpassword\");\r",
+									"\r",
+									"// username\r",
+									"if (vUsurname == \"vacio\") {\r",
+									"\tt_vUsurname=\"\";\r",
+									"} else if (vUsurname == \"OK\" ||  vUsurname == undefined) {\r",
+									"\tt_vUsurname=\"admin\";\r",
+									"} else\r",
+									"{\r",
+									"\tt_vUsurname= vUsurname ;\r",
+									"}\r",
+									"\r",
+									"// password\r",
+									"if (vpassword == \"vacio\") {\r",
+									"\tt_vpassword=\"\";\r",
+									"} else if (vpassword == \"OK\" ||  vpassword == undefined) {\r",
+									"\tt_vpassword=\"password123\";\r",
+									"} else\r",
+									"{\r",
+									"\tt_vpassword= vpassword ;\r",
+									"}\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vgUsurname\", t_vUsurname);\r",
+									"pm.globals.set(\"vgPassword\",t_vpassword);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c\");\r",
+									"\r",
+									"pm.test(\"Test Case: \"+ptestCase, function (){});\r",
+									"\r",
+									"\r",
+									"    //valid status\r",
+									"                pm.test(\"valid Status response:\" + pstatus, function () {\r",
+									"                    pm.response.to.have.status(pstatus);\r",
+									"                });\r",
+									"                if (ptestCaseSuite=='flow OK'){\r",
+									"                // valid token\r",
+									"                 pm.test(\"Valid token\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.token).to.not.be.null;\r",
+									"\r",
+									"                });\r",
+									"         }\r",
+									"                \r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"username\":\"{{vgUsurname}}\",\r\n\"password\":\"{{vgPassword}}\"\r\n\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/auth",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking Create Booking",
+			"item": [
+				{
+					"name": "01_CreateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfirstname = pm.iterationData.get(\"01_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"01_vlastname\");\r",
+									"var vtotalprice = pm.iterationData.get(\"01_vtotalprice\");\r",
+									"var vdepositpaid = pm.iterationData.get(\"01_vdepositpaid\");\r",
+									"var vcheckin = pm.iterationData.get(\"01_vcheckin\");\r",
+									"var vcheckout = pm.iterationData.get(\"01_vcheckout\");\r",
+									"var vadditionalneeds = pm.iterationData.get(\"01_vadditionalneeds\");\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"\r",
+									"function random(min, max) {\r",
+									"\treturn Math.floor((Math.random() * (max - min + 1)) + min);\r",
+									"}\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    } else if (vfirstname == \"OK\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    } else if (vlastname == \"OK\" || vlastname == undefined) {\r",
+									"        t_vlastname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"// totalprice\r",
+									"if (vtotalprice == \"vacio\") {\r",
+									"\tt_vtotalprice = \"\";\r",
+									"    }else if (vtotalprice == \"nulo\") {\r",
+									"        t_vtotalprice = null;   \r",
+									"    } else if (vtotalprice == \"OK\" || vtotalprice == undefined) {\r",
+									"        t_vtotalprice = random(1, 100);\r",
+									"        } else {\r",
+									"            t_vtotalprice = vtotalprice;\r",
+									"        }\r",
+									"\r",
+									"// depositpaid\r",
+									"if (vdepositpaid == \"vacio\") {\r",
+									"\tt_vdepositpaid = null;\r",
+									"    }else if (vdepositpaid == \"nulo\") {\r",
+									"        t_vdepositpaid = null;   \r",
+									"    } else if (vdepositpaid == \"OK\" || vdepositpaid == undefined) {\r",
+									"        t_vdepositpaid = true;\r",
+									"        } else {\r",
+									"            t_vdepositpaid = vdepositpaid;\r",
+									"        }\r",
+									"\r",
+									"// checkin\r",
+									"if (vcheckin == \"vacio\") {\r",
+									"\tt_vcheckin = \"\";\r",
+									"    }else if (vcheckin == \"nulo\") {\r",
+									"        t_vcheckin = null;   \r",
+									"    } else if (vcheckin == \"OK\" || vcheckin == undefined) {\r",
+									"        t_vcheckin = \"2023-10-01\"\r",
+									"        } else {\r",
+									"            t_vcheckin = vcheckin;\r",
+									"        }\r",
+									"\r",
+									"// checkout\r",
+									"if (vcheckout == \"vacio\") {\r",
+									"\tt_vcheckout = \"\";\r",
+									"    }else if (vcheckout == \"nulo\") {\r",
+									"        t_vcheckout = null;   \r",
+									"    } else if (vcheckout == \"OK\" || vcheckout == undefined) {\r",
+									"        t_vcheckout = \"2023-10-02\"\r",
+									"        } else {\r",
+									"            t_vcheckout = vcheckout;\r",
+									"        }\r",
+									"\r",
+									"// additionalneeds\r",
+									"if (vadditionalneeds == \"vacio\") {\r",
+									"\tt_vadditionalneeds = \"\";\r",
+									"    }else if (vadditionalneeds == \"nulo\") {\r",
+									"        t_vadditionalneeds = null;   \r",
+									"    } else if (vadditionalneeds == \"OK\" || vadditionalneeds == undefined) {\r",
+									"        t_vadditionalneeds = makeid(8);\r",
+									"        } else {\r",
+									"            t_vadditionalneeds = vadditionalneeds;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vgfirstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vglastname\", t_vlastname);\r",
+									"pm.globals.set(\"vgtotalprice\", t_vtotalprice);\r",
+									"pm.globals.set(\"vgdepositpaid\", t_vdepositpaid);\r",
+									"pm.globals.set(\"vgcheckin\", t_vcheckin);\r",
+									"pm.globals.set(\"vgcheckout\", t_vcheckout);\r",
+									"pm.globals.set(\"vgadditionalneeds\", t_vadditionalneeds);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c\");\r",
+									"\r",
+									"\r",
+									"pm.test(\"Test Case: \"+ptestCase, function (){});\r",
+									"const testsuite1 = 'flow';\r",
+									"\r",
+									"\r",
+									"if (ptestCaseSuite==testsuite1 ||  ptestCaseSuite==undefined){\r",
+									"\r",
+									"    //valid status\r",
+									"                pm.test(\"valid Status response:\" + pstatus, function () {\r",
+									"                    pm.response.to.have.status(pstatus);\r",
+									"                });\r",
+									"\r",
+									"    if (pstatus=='200')\r",
+									"            {\r",
+									"                // valid bookingid\r",
+									"                 pm.test(\"Valid bookingid\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.bookingid).to.not.be.null;\r",
+									"                });\r",
+									"                // valid firstname\r",
+									"                pm.test(\"valid firstname\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.firstname).to.eql(''+pm.globals.get(\"vgfirstname\")+'');\r",
+									"                });\r",
+									"                 // valid lastname\r",
+									"                pm.test(\"valid lastname \"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.lastname).to.eql(''+pm.globals.get(\"vglastname\")+'');\r",
+									"                });\r",
+									"                // valid totalprice\r",
+									"                pm.test(\"valid totalprice\" , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.totalprice).to.eql(pm.globals.get(\"vgtotalprice\"));\r",
+									"                });\r",
+									"                // valid depositpaid\r",
+									"                pm.test(\"valid depositpaid\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.depositpaid).to.eql(pm.globals.get(\"vgdepositpaid\"));\r",
+									"                });\r",
+									"\r",
+									"            // valid checkin\r",
+									"                pm.test(\"valid checkin\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckin\")==!('vacio')||pm.iterationData.get(\"01_vcheckin\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.booking.bookingdates.checkin).to.eql(''+pm.globals.get(\"vgcheckin\")+'');}\r",
+									"                });\r",
+									"            // valid checkout\r",
+									"                pm.test(\"valid checkout\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckout\")==!('vacio')||pm.iterationData.get(\"01_vcheckout\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.booking.bookingdates.checkout).to.eql(''+pm.globals.get(\"vgcheckout\")+'');}\r",
+									"                });\r",
+									"            // valid additionalneeds\r",
+									"                pm.test(\"valid additionalneeds\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.additionalneeds).to.eql(''+pm.globals.get(\"vgadditionalneeds\")+'');\r",
+									"                });\r",
+									"            }\r",
+									"    }\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.globals.set(\"vgbookingid\", jsonData.bookingid);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vgfirstname}}\",\r\n    \"lastname\" : \"{{vglastname}}\",\r\n    \"totalprice\" : {{vgtotalprice}},\r\n    \"depositpaid\" : {{vgdepositpaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{vgcheckin}}\",\r\n        \"checkout\" : \"{{vgcheckout}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{vgadditionalneeds}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking GetBookingIds Booking",
+			"item": [
+				{
+					"name": "01_CreateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfirstname = pm.iterationData.get(\"01_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"01_vlastname\");\r",
+									"var vtotalprice = pm.iterationData.get(\"01_vtotalprice\");\r",
+									"var vdepositpaid = pm.iterationData.get(\"01_vdepositpaid\");\r",
+									"var vcheckin = pm.iterationData.get(\"01_vcheckin\");\r",
+									"var vcheckout = pm.iterationData.get(\"01_vcheckout\");\r",
+									"var vadditionalneeds = pm.iterationData.get(\"01_vadditionalneeds\");\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"\r",
+									"function random(min, max) {\r",
+									"\treturn Math.floor((Math.random() * (max - min + 1)) + min);\r",
+									"}\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    } else if (vfirstname == \"OK\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    } else if (vlastname == \"OK\" || vlastname == undefined) {\r",
+									"        t_vlastname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"// totalprice\r",
+									"if (vtotalprice == \"vacio\") {\r",
+									"\tt_vtotalprice = \"\";\r",
+									"    }else if (vtotalprice == \"nulo\") {\r",
+									"        t_vtotalprice = null;   \r",
+									"    } else if (vtotalprice == \"OK\" || vtotalprice == undefined) {\r",
+									"        t_vtotalprice = random(1, 100);\r",
+									"        } else {\r",
+									"            t_vtotalprice = vtotalprice;\r",
+									"        }\r",
+									"\r",
+									"// depositpaid\r",
+									"if (vdepositpaid == \"vacio\") {\r",
+									"\tt_vdepositpaid = null;\r",
+									"    }else if (vdepositpaid == \"nulo\") {\r",
+									"        t_vdepositpaid = null;   \r",
+									"    } else if (vdepositpaid == \"OK\" || vdepositpaid == undefined) {\r",
+									"        t_vdepositpaid = true;\r",
+									"        } else {\r",
+									"            t_vdepositpaid = vdepositpaid;\r",
+									"        }\r",
+									"\r",
+									"// checkin\r",
+									"if (vcheckin == \"vacio\") {\r",
+									"\tt_vcheckin = \"\";\r",
+									"    }else if (vcheckin == \"nulo\") {\r",
+									"        t_vcheckin = null;   \r",
+									"    } else if (vcheckin == \"OK\" || vcheckin == undefined) {\r",
+									"        t_vcheckin = \"2023-10-01\"\r",
+									"        } else {\r",
+									"            t_vcheckin = vcheckin;\r",
+									"        }\r",
+									"\r",
+									"// checkout\r",
+									"if (vcheckout == \"vacio\") {\r",
+									"\tt_vcheckout = \"\";\r",
+									"    }else if (vcheckout == \"nulo\") {\r",
+									"        t_vcheckout = null;   \r",
+									"    } else if (vcheckout == \"OK\" || vcheckout == undefined) {\r",
+									"        t_vcheckout = \"2023-10-02\"\r",
+									"        } else {\r",
+									"            t_vcheckout = vcheckout;\r",
+									"        }\r",
+									"\r",
+									"// additionalneeds\r",
+									"if (vadditionalneeds == \"vacio\") {\r",
+									"\tt_vadditionalneeds = \"\";\r",
+									"    }else if (vadditionalneeds == \"nulo\") {\r",
+									"        t_vadditionalneeds = null;   \r",
+									"    } else if (vadditionalneeds == \"OK\" || vadditionalneeds == undefined) {\r",
+									"        t_vadditionalneeds = makeid(8);\r",
+									"        } else {\r",
+									"            t_vadditionalneeds = vadditionalneeds;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vgfirstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vglastname\", t_vlastname);\r",
+									"pm.globals.set(\"vgtotalprice\", t_vtotalprice);\r",
+									"pm.globals.set(\"vgdepositpaid\", t_vdepositpaid);\r",
+									"pm.globals.set(\"vgcheckin\", t_vcheckin);\r",
+									"pm.globals.set(\"vgcheckout\", t_vcheckout);\r",
+									"pm.globals.set(\"vgadditionalneeds\", t_vadditionalneeds);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c\");\r",
+									"\r",
+									"\r",
+									"pm.test(\"Test Case: \"+ptestCase, function (){});\r",
+									"const testsuite1 = 'flow';\r",
+									"\r",
+									"\r",
+									"\r",
+									"    if (pstatus=='200')\r",
+									"            {\r",
+									"                // valid bookingid\r",
+									"                 pm.test(\"Valid bookingid\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.bookingid).to.not.be.null;\r",
+									"                });\r",
+									"                // valid firstname\r",
+									"                pm.test(\"valid firstname\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.firstname).to.eql(''+pm.globals.get(\"vgfirstname\")+'');\r",
+									"                });\r",
+									"                 // valid lastname\r",
+									"                pm.test(\"valid lastname \"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.lastname).to.eql(''+pm.globals.get(\"vglastname\")+'');\r",
+									"                });\r",
+									"                // valid totalprice\r",
+									"                pm.test(\"valid totalprice\" , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.totalprice).to.eql(pm.globals.get(\"vgtotalprice\"));\r",
+									"                });\r",
+									"                // valid depositpaid\r",
+									"                pm.test(\"valid depositpaid\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.depositpaid).to.eql(pm.globals.get(\"vgdepositpaid\"));\r",
+									"                });\r",
+									"\r",
+									"            // valid checkin\r",
+									"                pm.test(\"valid checkin\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckin\")==!('vacio')||pm.iterationData.get(\"01_vcheckin\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.booking.bookingdates.checkin).to.eql(''+pm.globals.get(\"vgcheckin\")+'');}\r",
+									"                });\r",
+									"            // valid checkout\r",
+									"                pm.test(\"valid checkout\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckout\")==!('vacio')||pm.iterationData.get(\"01_vcheckout\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.booking.bookingdates.checkout).to.eql(''+pm.globals.get(\"vgcheckout\")+'');}\r",
+									"                });\r",
+									"            // valid additionalneeds\r",
+									"                pm.test(\"valid additionalneeds\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.booking.additionalneeds).to.eql(''+pm.globals.get(\"vgadditionalneeds\")+'');\r",
+									"                });\r",
+									"            }\r",
+									"    \r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.globals.set(\"vgbookingid\", jsonData.bookingid);\r",
+									"pm.globals.set(\"vg2lastname\", jsonData.booking.lastname);\r",
+									"pm.globals.set(\"vg2firstname\", jsonData.booking.firstname);\r",
+									"pm.globals.set(\"vg2checkin\", jsonData.booking.bookingdates.checkin);\r",
+									"pm.globals.set(\"vg2checkout\", jsonData.booking.bookingdates.checkout);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vgfirstname}}\",\r\n    \"lastname\" : \"{{vglastname}}\",\r\n    \"totalprice\" : {{vgtotalprice}},\r\n    \"depositpaid\" : {{vgdepositpaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{vgcheckin}}\",\r\n        \"checkout\" : \"{{vgcheckout}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{vgadditionalneeds}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "02_GetBookingIds Booking by lastNameFirtName",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfirstname = pm.iterationData.get(\"02_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"02_vlastname\");\r",
+									"\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    } else if (vfirstname == \"OK\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = pm.globals.get(\"vg2firstname\");\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    } else if (vlastname == \"OK\" || vlastname == undefined) {\r",
+									"        t_vlastname = pm.globals.get(\"vg2lastname\");\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vg3firstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vg3lastname\", t_vlastname);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c2\");\r",
+									"\r",
+									"\r",
+									"pm.test(\"Test Case: \"+ptestCase, function (){});\r",
+									"const testsuite1 = 'flow';\r",
+									"\r",
+									"\r",
+									"if (ptestCaseSuite==testsuite1 ||  ptestCaseSuite==undefined){\r",
+									"\r",
+									"    //valid status\r",
+									"                pm.test(\"valid Status response:\" + pstatus, function () {\r",
+									"                    pm.response.to.have.status(pstatus);\r",
+									"                });\r",
+									"\r",
+									"    if (ptestCase=='Flujo OK'||  ptestCase==undefined)\r",
+									"            {\r",
+									"             \r",
+									"                // valid bookingid\r",
+									"                pm.test(\"valid bookingid\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData[0].bookingid).to.eql(pm.globals.get(\"vgbookingid\"));\r",
+									"                });\r",
+									"            }\r",
+									"            else\r",
+									"            {\r",
+									"                pm.test(\"valid that not has bookingid\", function () {\r",
+									"                pm.response.to.not.have.jsonBody(\"bookingid\");\r",
+									"                    });\r",
+									"            }\r",
+									"                \r",
+									"    }\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking?firstname={{vg3firstname}}&lastname={{vg3lastname}}",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "firstname",
+									"value": "{{vg3firstname}}"
+								},
+								{
+									"key": "lastname",
+									"value": "{{vg3lastname}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "02_GetBookingIds by checkin checkout - NO funciona",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking?checkin={{vg2checkin}}&checkout={{vg2checkout}}",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "checkin",
+									"value": "{{vg2checkin}}"
+								},
+								{
+									"key": "checkout",
+									"value": "{{vg2checkout}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking - GetBooking",
+			"item": [
+				{
+					"name": "01_CreateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfirstname = pm.iterationData.get(\"01_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"01_vlastname\");\r",
+									"var vtotalprice = pm.iterationData.get(\"01_vtotalprice\");\r",
+									"var vdepositpaid = pm.iterationData.get(\"01_vdepositpaid\");\r",
+									"var vcheckin = pm.iterationData.get(\"01_vcheckin\");\r",
+									"var vcheckout = pm.iterationData.get(\"01_vcheckout\");\r",
+									"var vadditionalneeds = pm.iterationData.get(\"01_vadditionalneeds\");\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"\r",
+									"function random(min, max) {\r",
+									"\treturn Math.floor((Math.random() * (max - min + 1)) + min);\r",
+									"}\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    } else if (vfirstname == \"OK\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    } else if (vlastname == \"OK\" || vlastname == undefined) {\r",
+									"        t_vlastname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"// totalprice\r",
+									"if (vtotalprice == \"vacio\") {\r",
+									"\tt_vtotalprice = \"\";\r",
+									"    }else if (vtotalprice == \"nulo\") {\r",
+									"        t_vtotalprice = null;   \r",
+									"    } else if (vtotalprice == \"OK\" || vtotalprice == undefined) {\r",
+									"        t_vtotalprice = random(1, 100);\r",
+									"        } else {\r",
+									"            t_vtotalprice = vtotalprice;\r",
+									"        }\r",
+									"\r",
+									"// depositpaid\r",
+									"if (vdepositpaid == \"vacio\") {\r",
+									"\tt_vdepositpaid = null;\r",
+									"    }else if (vdepositpaid == \"nulo\") {\r",
+									"        t_vdepositpaid = null;   \r",
+									"    } else if (vdepositpaid == \"OK\" || vdepositpaid == undefined) {\r",
+									"        t_vdepositpaid = true;\r",
+									"        } else {\r",
+									"            t_vdepositpaid = vdepositpaid;\r",
+									"        }\r",
+									"\r",
+									"// checkin\r",
+									"if (vcheckin == \"vacio\") {\r",
+									"\tt_vcheckin = \"\";\r",
+									"    }else if (vcheckin == \"nulo\") {\r",
+									"        t_vcheckin = null;   \r",
+									"    } else if (vcheckin == \"OK\" || vcheckin == undefined) {\r",
+									"        t_vcheckin = \"2023-10-01\"\r",
+									"        } else {\r",
+									"            t_vcheckin = vcheckin;\r",
+									"        }\r",
+									"\r",
+									"// checkout\r",
+									"if (vcheckout == \"vacio\") {\r",
+									"\tt_vcheckout = \"\";\r",
+									"    }else if (vcheckout == \"nulo\") {\r",
+									"        t_vcheckout = null;   \r",
+									"    } else if (vcheckout == \"OK\" || vcheckout == undefined) {\r",
+									"        t_vcheckout = \"2023-10-02\"\r",
+									"        } else {\r",
+									"            t_vcheckout = vcheckout;\r",
+									"        }\r",
+									"\r",
+									"// additionalneeds\r",
+									"if (vadditionalneeds == \"vacio\") {\r",
+									"\tt_vadditionalneeds = \"\";\r",
+									"    }else if (vadditionalneeds == \"nulo\") {\r",
+									"        t_vadditionalneeds = null;   \r",
+									"    } else if (vadditionalneeds == \"OK\" || vadditionalneeds == undefined) {\r",
+									"        t_vadditionalneeds = makeid(8);\r",
+									"        } else {\r",
+									"            t_vadditionalneeds = vadditionalneeds;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vgfirstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vglastname\", t_vlastname);\r",
+									"pm.globals.set(\"vgtotalprice\", t_vtotalprice);\r",
+									"pm.globals.set(\"vgdepositpaid\", t_vdepositpaid);\r",
+									"pm.globals.set(\"vgcheckin\", t_vcheckin);\r",
+									"pm.globals.set(\"vgcheckout\", t_vcheckout);\r",
+									"pm.globals.set(\"vgadditionalneeds\", t_vadditionalneeds);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c\");\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.globals.set(\"vgbookingid\", jsonData.bookingid);\r",
+									"pm.globals.set(\"vg2lastname\", jsonData.booking.lastname);\r",
+									"pm.globals.set(\"vg2firstname\", jsonData.booking.firstname);\r",
+									"pm.globals.set(\"vg2totalprice\", jsonData.booking.totalprice);\r",
+									"pm.globals.set(\"vg2depositpaid\", jsonData.booking.depositpaid);\r",
+									"pm.globals.set(\"vg2additionalneeds\", jsonData.booking.additionalneeds);\r",
+									"pm.globals.set(\"vg2checkin\", jsonData.booking.bookingdates.checkin);\r",
+									"pm.globals.set(\"vg2checkout\", jsonData.booking.bookingdates.checkout);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vgfirstname}}\",\r\n    \"lastname\" : \"{{vglastname}}\",\r\n    \"totalprice\" : {{vgtotalprice}},\r\n    \"depositpaid\" : {{vgdepositpaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{vgcheckin}}\",\r\n        \"checkout\" : \"{{vgcheckout}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{vgadditionalneeds}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "03_GetBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfbookingid = pm.iterationData.get(\"03_vgbookingid\");\r",
+									"\r",
+									"// fbookingid\r",
+									"if (vfbookingid == \"vacio\") {\r",
+									"\tt_vfbookingid = \"\";\r",
+									"    } else if (vfbookingid == \"OK\" || vfbookingid == undefined) {\r",
+									"        t_vfbookingid = pm.globals.get(\"vgbookingid\");\r",
+									"        } else {\r",
+									"            t_vfbookingid = vfbookingid;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vg3fbookingid\", t_vfbookingid);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c3\");\r",
+									"\r",
+									" \r",
+									"     if (ptestSuite=='Flujo OK'||  ptestSuite==undefined)\r",
+									"            {\r",
+									"  \r",
+									"            //valid status\r",
+									"                        pm.test(\"valid Status response:\" + pstatus, function () {\r",
+									"                            pm.response.to.have.status(pstatus);\r",
+									"                        });\r",
+									"\r",
+									"\r",
+									"                    \r",
+									"                        // valid bookingid\r",
+									"                        pm.test(\"Valid bookingid\", function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            pm.expect(jsonData.bookingid).to.not.be.null;\r",
+									"                        });\r",
+									"                        // valid firstname\r",
+									"                        pm.test(\"valid firstname\", function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            pm.expect(jsonData.firstname).to.eql(''+pm.globals.get(\"vg2firstname\")+'');\r",
+									"                        });\r",
+									"                        // valid lastname\r",
+									"                        pm.test(\"valid lastname \"  , function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            pm.expect(jsonData.lastname).to.eql(''+pm.globals.get(\"vg2lastname\")+'');\r",
+									"                        });\r",
+									"                        // valid totalprice\r",
+									"                        pm.test(\"valid totalprice\" , function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            pm.expect(jsonData.totalprice).to.eql(pm.globals.get(\"vg2totalprice\"));\r",
+									"                        });\r",
+									"                        // valid depositpaid\r",
+									"                        pm.test(\"valid depositpaid\"  , function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            pm.expect(jsonData.depositpaid).to.eql(pm.globals.get(\"vg2depositpaid\"));\r",
+									"                        });\r",
+									"\r",
+									"                    // valid checkin\r",
+									"                        pm.test(\"valid checkin\"  , function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            if(pm.iterationData.get(\"01_vcheckin\")==!('vacio')||pm.iterationData.get(\"01_vcheckin\")==!('vacio')){\r",
+									"                            pm.expect(jsonData.bookingdates.checkin).to.eql(''+pm.globals.get(\"vg2checkin\")+'');}\r",
+									"                        });\r",
+									"                    // valid checkout\r",
+									"                        pm.test(\"valid checkout\"  , function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            if(pm.iterationData.get(\"01_vcheckout\")==!('vacio')||pm.iterationData.get(\"01_vcheckout\")==!('vacio')){\r",
+									"                            pm.expect(jsonData.bookingdates.checkout).to.eql(''+pm.globals.get(\"vg2checkout\")+'');}\r",
+									"                        });\r",
+									"                    // valid additionalneeds\r",
+									"                        pm.test(\"valid additionalneeds\"  , function () {\r",
+									"                            var jsonData = pm.response.json();\r",
+									"                            pm.expect(jsonData.additionalneeds).to.eql(''+pm.globals.get(\"vg2additionalneeds\")+'');\r",
+									"                        });\r",
+									"                    }\r",
+									"        "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking/{{vg3fbookingid}}",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking",
+								"{{vg3fbookingid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking - UpdateBooking",
+			"item": [
+				{
+					"name": "01_CreateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfirstname = pm.iterationData.get(\"01_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"01_vlastname\");\r",
+									"var vtotalprice = pm.iterationData.get(\"01_vtotalprice\");\r",
+									"var vdepositpaid = pm.iterationData.get(\"01_vdepositpaid\");\r",
+									"var vcheckin = pm.iterationData.get(\"01_vcheckin\");\r",
+									"var vcheckout = pm.iterationData.get(\"01_vcheckout\");\r",
+									"var vadditionalneeds = pm.iterationData.get(\"01_vadditionalneeds\");\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"\r",
+									"function random(min, max) {\r",
+									"\treturn Math.floor((Math.random() * (max - min + 1)) + min);\r",
+									"}\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    } else if (vfirstname == \"OK\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    } else if (vlastname == \"OK\" || vlastname == undefined) {\r",
+									"        t_vlastname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"// totalprice\r",
+									"if (vtotalprice == \"vacio\") {\r",
+									"\tt_vtotalprice = \"\";\r",
+									"    }else if (vtotalprice == \"nulo\") {\r",
+									"        t_vtotalprice = null;   \r",
+									"    } else if (vtotalprice == \"OK\" || vtotalprice == undefined) {\r",
+									"        t_vtotalprice = random(1, 100);\r",
+									"        } else {\r",
+									"            t_vtotalprice = vtotalprice;\r",
+									"        }\r",
+									"\r",
+									"// depositpaid\r",
+									"if (vdepositpaid == \"vacio\") {\r",
+									"\tt_vdepositpaid = null;\r",
+									"    }else if (vdepositpaid == \"nulo\") {\r",
+									"        t_vdepositpaid = null;   \r",
+									"    } else if (vdepositpaid == \"OK\" || vdepositpaid == undefined) {\r",
+									"        t_vdepositpaid = true;\r",
+									"        } else {\r",
+									"            t_vdepositpaid = vdepositpaid;\r",
+									"        }\r",
+									"\r",
+									"// checkin\r",
+									"if (vcheckin == \"vacio\") {\r",
+									"\tt_vcheckin = \"\";\r",
+									"    }else if (vcheckin == \"nulo\") {\r",
+									"        t_vcheckin = null;   \r",
+									"    } else if (vcheckin == \"OK\" || vcheckin == undefined) {\r",
+									"        t_vcheckin = \"2023-10-01\"\r",
+									"        } else {\r",
+									"            t_vcheckin = vcheckin;\r",
+									"        }\r",
+									"\r",
+									"// checkout\r",
+									"if (vcheckout == \"vacio\") {\r",
+									"\tt_vcheckout = \"\";\r",
+									"    }else if (vcheckout == \"nulo\") {\r",
+									"        t_vcheckout = null;   \r",
+									"    } else if (vcheckout == \"OK\" || vcheckout == undefined) {\r",
+									"        t_vcheckout = \"2023-10-02\"\r",
+									"        } else {\r",
+									"            t_vcheckout = vcheckout;\r",
+									"        }\r",
+									"\r",
+									"// additionalneeds\r",
+									"if (vadditionalneeds == \"vacio\") {\r",
+									"\tt_vadditionalneeds = \"\";\r",
+									"    }else if (vadditionalneeds == \"nulo\") {\r",
+									"        t_vadditionalneeds = null;   \r",
+									"    } else if (vadditionalneeds == \"OK\" || vadditionalneeds == undefined) {\r",
+									"        t_vadditionalneeds = makeid(8);\r",
+									"        } else {\r",
+									"            t_vadditionalneeds = vadditionalneeds;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vgfirstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vglastname\", t_vlastname);\r",
+									"pm.globals.set(\"vgtotalprice\", t_vtotalprice);\r",
+									"pm.globals.set(\"vgdepositpaid\", t_vdepositpaid);\r",
+									"pm.globals.set(\"vgcheckin\", t_vcheckin);\r",
+									"pm.globals.set(\"vgcheckout\", t_vcheckout);\r",
+									"pm.globals.set(\"vgadditionalneeds\", t_vadditionalneeds);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.globals.set(\"vg4bookingid\", jsonData.bookingid);\r",
+									"pm.globals.set(\"vg4lastname\", jsonData.booking.lastname);\r",
+									"pm.globals.set(\"vg4firstname\", jsonData.booking.firstname);\r",
+									"pm.globals.set(\"vg4totalprice\", jsonData.booking.totalprice);\r",
+									"pm.globals.set(\"vg4depositpaid\", jsonData.booking.depositpaid);\r",
+									"pm.globals.set(\"vg4additionalneeds\", jsonData.booking.additionalneeds);\r",
+									"pm.globals.set(\"vg4checkin\", jsonData.booking.bookingdates.checkin);\r",
+									"pm.globals.set(\"vg4checkout\", jsonData.booking.bookingdates.checkout);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vgfirstname}}\",\r\n    \"lastname\" : \"{{vglastname}}\",\r\n    \"totalprice\" : 11,\r\n    \"depositpaid\" : {{vgdepositpaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{vgcheckin}}\",\r\n        \"checkout\" : \"{{vgcheckout}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{vgadditionalneeds}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "04_UpdateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vbookingid = pm.iterationData.get(\"04_vbookingid\");\r",
+									"var vfirstname = pm.iterationData.get(\"04_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"04_vlastname\");\r",
+									"var vtotalprice = pm.iterationData.get(\"04_vtotalprice\");\r",
+									"var vdepositpaid = pm.iterationData.get(\"04_vdepositpaid\");\r",
+									"var vcheckin = pm.iterationData.get(\"04_vcheckin\");\r",
+									"var vcheckout = pm.iterationData.get(\"04_vcheckout\");\r",
+									"var vadditionalneeds = pm.iterationData.get(\"04_vadditionalneeds\");\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"\r",
+									"function random(min, max) {\r",
+									"\treturn Math.floor((Math.random() * (max - min + 1)) + min);\r",
+									"}\r",
+									"// bookingid\r",
+									"if (vbookingid == \"vacio\") {\r",
+									"\tt_bookingid = \"\";\r",
+									"    }else if (vbookingid == \"nulo\") {\r",
+									"        t_vbookingid= null;\r",
+									"     }else if (vbookingid == \"actualizado\") {\r",
+									"        t_vbookingid= pm.globals.get(\"vg4bookingid\");\r",
+									"    } else if (vbookingid == \"matiene valor\" || vbookingid == undefined) {\r",
+									"        t_vbookingid = pm.globals.get(\"vg4bookingid\");\r",
+									"        } else {\r",
+									"            t_vbookingid = vbookingid;\r",
+									"        }\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    }else if (vfirstname == \"actualizado\") {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"    }else if (vfirstname == \"matiene valor\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = pm.globals.get(\"vg4firstname\");\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    }else if (vlastname == \"actualizado\") {\r",
+									"        t_vlastname = makeid(8);\r",
+									"    } else if (vlastname == \"matiene valor\" || vlastname == undefined) {\r",
+									"        t_vlastname =  pm.globals.get(\"vg4lastname\");\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"// totalprice\r",
+									"if (vtotalprice == \"vacio\") {\r",
+									"\tt_vtotalprice = \"\";\r",
+									"    }else if (vtotalprice == \"nulo\") {\r",
+									"        t_vtotalprice = null;   \r",
+									"    }else if (vtotalprice == \"actualizado\") {\r",
+									"        t_vtotalprice =random(1, 100);\r",
+									"    } else if (vtotalprice == \"matiene valor\" || vtotalprice == undefined) {\r",
+									"        t_vtotalprice = pm.globals.get(\"vg4totalprice\");\r",
+									"        } else {\r",
+									"            t_vtotalprice = vtotalprice;\r",
+									"        }\r",
+									"\r",
+									"// depositpaid\r",
+									"if (vdepositpaid == \"vacio\") {\r",
+									"\tt_vdepositpaid = null;\r",
+									"    }else if (vdepositpaid == \"nulo\") {\r",
+									"        t_vdepositpaid = null;   \r",
+									"    }else if (vdepositpaid == \"actualizado\") {\r",
+									"        t_vdepositpaid =false;\r",
+									"    } else if (vdepositpaid == \"matiene valor\" || vdepositpaid == undefined) {\r",
+									"        t_vdepositpaid = pm.globals.get(\"vg4depositpaid\")\r",
+									"        } else {\r",
+									"            t_vdepositpaid = vdepositpaid;\r",
+									"        }\r",
+									"\r",
+									"// checkin\r",
+									"if (vcheckin == \"vacio\") {\r",
+									"\tt_vcheckin = \"\";\r",
+									"    }else if (vcheckin == \"nulo\") {\r",
+									"        t_vcheckin = null;   \r",
+									"    } else if (vcheckin == \"actualizado\") {\r",
+									"        t_vcheckind =\"2023-11-02\";\r",
+									"    }else if (vcheckin == \"matiene valor\" || vcheckin == undefined) {\r",
+									"        t_vcheckin = pm.globals.get(\"vg4checkin\")\r",
+									"        } else {\r",
+									"            t_vcheckin = vcheckin;\r",
+									"        }\r",
+									"\r",
+									"// checkout\r",
+									"if (vcheckout == \"vacio\") {\r",
+									"\tt_vcheckout = \"\";\r",
+									"    }else if (vcheckout == \"nulo\") {\r",
+									"        t_vcheckout = null;   \r",
+									"    } else if (vcheckout == \"actualizado\") {\r",
+									"        t_vcheckout =\"2023-11-03\";\r",
+									"    } else if (vcheckout == \"matiene valor\" || vcheckout == undefined) {\r",
+									"        t_vcheckout = pm.globals.get(\"vg4checkout\")\r",
+									"        } else {\r",
+									"            t_vcheckout = vcheckout;\r",
+									"        }\r",
+									"\r",
+									"// additionalneeds\r",
+									"if (vadditionalneeds == \"vacio\") {\r",
+									"\tt_vadditionalneeds = \"\";\r",
+									"    }else if (vadditionalneeds == \"actualizado\") {\r",
+									"        t_vadditionalneeds =makeid(8);\r",
+									"    }else if (vadditionalneeds == \"nulo\") {\r",
+									"        t_vadditionalneeds = null;   \r",
+									"    } else if (vadditionalneeds == \"matiene valor\" || vadditionalneeds == undefined) {\r",
+									"        t_vadditionalneeds = pm.globals.get(\"vg4additionalneeds\")\r",
+									"\r",
+									"        } else {\r",
+									"            t_vadditionalneeds = vadditionalneeds;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vg4_2bookingid\", t_vbookingid);\r",
+									"pm.globals.set(\"vg4_2firstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vg4_2lastname\", t_vlastname);\r",
+									"pm.globals.set(\"vg4_2totalprice\", t_vtotalprice);\r",
+									"pm.globals.set(\"vg4_2depositpaid\", t_vdepositpaid);\r",
+									"pm.globals.set(\"vg4_2checkin\", t_vcheckin);\r",
+									"pm.globals.set(\"vg4_2checkout\", t_vcheckout);\r",
+									"pm.globals.set(\"vg4_2additionalneeds\", t_vadditionalneeds);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c4\");\r",
+									"\r",
+									"\r",
+									"pm.test(\"Test Case: \"+ptestCase, function (){});\r",
+									"const testsuite1 = 'flow';\r",
+									"\r",
+									"\r",
+									"if (ptestCaseSuite==testsuite1 ||  ptestCaseSuite==undefined){\r",
+									"\r",
+									"    //valid status\r",
+									"                pm.test(\"valid Status response:\" + pstatus, function () {\r",
+									"                    pm.response.to.have.status(pstatus);\r",
+									"                });\r",
+									"    if (pstatus=='200')\r",
+									"            {\r",
+									"                // valid bookingid\r",
+									"                 pm.test(\"Valid bookingid\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.bookingid).to.not.be.null;\r",
+									"                });\r",
+									"                // valid firstname\r",
+									"                pm.test(\"valid firstname\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.firstname).to.eql(''+pm.globals.get(\"vg4_2firstname\")+'');\r",
+									"                });\r",
+									"                 // valid lastname\r",
+									"                pm.test(\"valid lastname \"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.lastname).to.eql(''+pm.globals.get(\"vg4_2lastname\")+'');\r",
+									"                });\r",
+									"                // valid totalprice\r",
+									"                pm.test(\"valid totalprice\" , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.totalprice).to.eql(pm.globals.get(\"vg4_2totalprice\"));\r",
+									"                });\r",
+									"                // valid depositpaid\r",
+									"                pm.test(\"valid depositpaid\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.depositpaid).to.eql(pm.globals.get(\"vg4_2depositpaid\"));\r",
+									"                });\r",
+									"\r",
+									"            // valid checkin\r",
+									"                pm.test(\"valid checkin\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckin\")==!('vacio')||pm.iterationData.get(\"01_vcheckin\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.bookingdates.checkin).to.eql(''+pm.globals.get(\"vg4_2checkin\")+'');}\r",
+									"                });\r",
+									"            // valid checkout\r",
+									"                pm.test(\"valid checkout\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckout\")==!('vacio')||pm.iterationData.get(\"01_vcheckout\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.bookingdates.checkout).to.eql(''+pm.globals.get(\"vg4_2checkout\")+'');}\r",
+									"                });\r",
+									"            // valid additionalneeds\r",
+									"                pm.test(\"valid additionalneeds\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.additionalneeds).to.eql(''+pm.globals.get(\"vg4_2additionalneeds\")+'');\r",
+									"                });\r",
+									"            }\r",
+									"    \r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Cookie",
+								"value": "abc123",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46cGFzc3dvcmQxMjM=",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vg4_2firstname}}\",\r\n    \"lastname\" : \"{{vg4_2lastname}}\",\r\n    \"totalprice\" : {{vg4_2totalprice}},\r\n    \"depositpaid\" : {{vg4_2depositpaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{vg4_2checkin}}\",\r\n        \"checkout\" : \"{{vg4_2checkout}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{vg4_2additionalneeds}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking/{{vg4_2bookingid}}",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking",
+								"{{vg4_2bookingid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking - DeleteBooking",
+			"item": [
+				{
+					"name": "01_CreateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfirstname = pm.iterationData.get(\"01_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"01_vlastname\");\r",
+									"var vtotalprice = pm.iterationData.get(\"01_vtotalprice\");\r",
+									"var vdepositpaid = pm.iterationData.get(\"01_vdepositpaid\");\r",
+									"var vcheckin = pm.iterationData.get(\"01_vcheckin\");\r",
+									"var vcheckout = pm.iterationData.get(\"01_vcheckout\");\r",
+									"var vadditionalneeds = pm.iterationData.get(\"01_vadditionalneeds\");\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"\r",
+									"function random(min, max) {\r",
+									"\treturn Math.floor((Math.random() * (max - min + 1)) + min);\r",
+									"}\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    } else if (vfirstname == \"OK\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    } else if (vlastname == \"OK\" || vlastname == undefined) {\r",
+									"        t_vlastname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"// totalprice\r",
+									"if (vtotalprice == \"vacio\") {\r",
+									"\tt_vtotalprice = \"\";\r",
+									"    }else if (vtotalprice == \"nulo\") {\r",
+									"        t_vtotalprice = null;   \r",
+									"    } else if (vtotalprice == \"OK\" || vtotalprice == undefined) {\r",
+									"        t_vtotalprice = random(1, 100);\r",
+									"        } else {\r",
+									"            t_vtotalprice = vtotalprice;\r",
+									"        }\r",
+									"\r",
+									"// depositpaid\r",
+									"if (vdepositpaid == \"vacio\") {\r",
+									"\tt_vdepositpaid = null;\r",
+									"    }else if (vdepositpaid == \"nulo\") {\r",
+									"        t_vdepositpaid = null;   \r",
+									"    } else if (vdepositpaid == \"OK\" || vdepositpaid == undefined) {\r",
+									"        t_vdepositpaid = true;\r",
+									"        } else {\r",
+									"            t_vdepositpaid = vdepositpaid;\r",
+									"        }\r",
+									"\r",
+									"// checkin\r",
+									"if (vcheckin == \"vacio\") {\r",
+									"\tt_vcheckin = \"\";\r",
+									"    }else if (vcheckin == \"nulo\") {\r",
+									"        t_vcheckin = null;   \r",
+									"    } else if (vcheckin == \"OK\" || vcheckin == undefined) {\r",
+									"        t_vcheckin = \"2023-10-01\"\r",
+									"        } else {\r",
+									"            t_vcheckin = vcheckin;\r",
+									"        }\r",
+									"\r",
+									"// checkout\r",
+									"if (vcheckout == \"vacio\") {\r",
+									"\tt_vcheckout = \"\";\r",
+									"    }else if (vcheckout == \"nulo\") {\r",
+									"        t_vcheckout = null;   \r",
+									"    } else if (vcheckout == \"OK\" || vcheckout == undefined) {\r",
+									"        t_vcheckout = \"2023-10-02\"\r",
+									"        } else {\r",
+									"            t_vcheckout = vcheckout;\r",
+									"        }\r",
+									"\r",
+									"// additionalneeds\r",
+									"if (vadditionalneeds == \"vacio\") {\r",
+									"\tt_vadditionalneeds = \"\";\r",
+									"    }else if (vadditionalneeds == \"nulo\") {\r",
+									"        t_vadditionalneeds = null;   \r",
+									"    } else if (vadditionalneeds == \"OK\" || vadditionalneeds == undefined) {\r",
+									"        t_vadditionalneeds = makeid(8);\r",
+									"        } else {\r",
+									"            t_vadditionalneeds = vadditionalneeds;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vgfirstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vglastname\", t_vlastname);\r",
+									"pm.globals.set(\"vgtotalprice\", t_vtotalprice);\r",
+									"pm.globals.set(\"vgdepositpaid\", t_vdepositpaid);\r",
+									"pm.globals.set(\"vgcheckin\", t_vcheckin);\r",
+									"pm.globals.set(\"vgcheckout\", t_vcheckout);\r",
+									"pm.globals.set(\"vgadditionalneeds\", t_vadditionalneeds);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c\");\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.globals.set(\"vgbookingid\", jsonData.bookingid);\r",
+									"pm.globals.set(\"vg2lastname\", jsonData.booking.lastname);\r",
+									"pm.globals.set(\"vg2firstname\", jsonData.booking.firstname);\r",
+									"pm.globals.set(\"vg2totalprice\", jsonData.booking.totalprice);\r",
+									"pm.globals.set(\"vg2depositpaid\", jsonData.booking.depositpaid);\r",
+									"pm.globals.set(\"vg2additionalneeds\", jsonData.booking.additionalneeds);\r",
+									"pm.globals.set(\"vg2checkin\", jsonData.booking.bookingdates.checkin);\r",
+									"pm.globals.set(\"vg2checkout\", jsonData.booking.bookingdates.checkout);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vgfirstname}}\",\r\n    \"lastname\" : \"{{vglastname}}\",\r\n    \"totalprice\" : {{vgtotalprice}},\r\n    \"depositpaid\" : {{vgdepositpaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{vgcheckin}}\",\r\n        \"checkout\" : \"{{vgcheckout}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{vgadditionalneeds}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "06_DeleteBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfbookingid = pm.iterationData.get(\"03_vgbookingid\");\r",
+									"\r",
+									"// fbookingid\r",
+									"if (vfbookingid == \"vacio\") {\r",
+									"\tt_vfbookingid = \"\";\r",
+									"    } else if (vfbookingid == \"OK\" || vfbookingid == undefined) {\r",
+									"        t_vfbookingid = pm.globals.get(\"vgbookingid\");\r",
+									"        } else {\r",
+									"            t_vfbookingid = vfbookingid;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vg3fbookingid\", t_vfbookingid);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c3\");\r",
+									"\r",
+									" \r",
+									"     if (ptestSuite=='Flujo OK'||  ptestSuite==undefined)\r",
+									"            {\r",
+									"  \r",
+									"            //valid status\r",
+									"                        pm.test(\"valid Status response:\" + pstatus, function () {\r",
+									"                            pm.response.to.have.status(pstatus);\r",
+									"                        });\r",
+									"\r",
+									"                    }\r",
+									"        "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46cGFzc3dvcmQxMjM=",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking/{{vg3fbookingid}}",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking",
+								"{{vg3fbookingid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking - PartialUpdateBooking",
+			"item": [
+				{
+					"name": "01_CreateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vfirstname = pm.iterationData.get(\"01_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"01_vlastname\");\r",
+									"var vtotalprice = pm.iterationData.get(\"01_vtotalprice\");\r",
+									"var vdepositpaid = pm.iterationData.get(\"01_vdepositpaid\");\r",
+									"var vcheckin = pm.iterationData.get(\"01_vcheckin\");\r",
+									"var vcheckout = pm.iterationData.get(\"01_vcheckout\");\r",
+									"var vadditionalneeds = pm.iterationData.get(\"01_vadditionalneeds\");\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"\r",
+									"function random(min, max) {\r",
+									"\treturn Math.floor((Math.random() * (max - min + 1)) + min);\r",
+									"}\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    } else if (vfirstname == \"OK\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    } else if (vlastname == \"OK\" || vlastname == undefined) {\r",
+									"        t_vlastname = makeid(8);\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"// totalprice\r",
+									"if (vtotalprice == \"vacio\") {\r",
+									"\tt_vtotalprice = \"\";\r",
+									"    }else if (vtotalprice == \"nulo\") {\r",
+									"        t_vtotalprice = null;   \r",
+									"    } else if (vtotalprice == \"OK\" || vtotalprice == undefined) {\r",
+									"        t_vtotalprice = random(1, 100);\r",
+									"        } else {\r",
+									"            t_vtotalprice = vtotalprice;\r",
+									"        }\r",
+									"\r",
+									"// depositpaid\r",
+									"if (vdepositpaid == \"vacio\") {\r",
+									"\tt_vdepositpaid = null;\r",
+									"    }else if (vdepositpaid == \"nulo\") {\r",
+									"        t_vdepositpaid = null;   \r",
+									"    } else if (vdepositpaid == \"OK\" || vdepositpaid == undefined) {\r",
+									"        t_vdepositpaid = true;\r",
+									"        } else {\r",
+									"            t_vdepositpaid = vdepositpaid;\r",
+									"        }\r",
+									"\r",
+									"// checkin\r",
+									"if (vcheckin == \"vacio\") {\r",
+									"\tt_vcheckin = \"\";\r",
+									"    }else if (vcheckin == \"nulo\") {\r",
+									"        t_vcheckin = null;   \r",
+									"    } else if (vcheckin == \"OK\" || vcheckin == undefined) {\r",
+									"        t_vcheckin = \"2023-10-01\"\r",
+									"        } else {\r",
+									"            t_vcheckin = vcheckin;\r",
+									"        }\r",
+									"\r",
+									"// checkout\r",
+									"if (vcheckout == \"vacio\") {\r",
+									"\tt_vcheckout = \"\";\r",
+									"    }else if (vcheckout == \"nulo\") {\r",
+									"        t_vcheckout = null;   \r",
+									"    } else if (vcheckout == \"OK\" || vcheckout == undefined) {\r",
+									"        t_vcheckout = \"2023-10-02\"\r",
+									"        } else {\r",
+									"            t_vcheckout = vcheckout;\r",
+									"        }\r",
+									"\r",
+									"// additionalneeds\r",
+									"if (vadditionalneeds == \"vacio\") {\r",
+									"\tt_vadditionalneeds = \"\";\r",
+									"    }else if (vadditionalneeds == \"nulo\") {\r",
+									"        t_vadditionalneeds = null;   \r",
+									"    } else if (vadditionalneeds == \"OK\" || vadditionalneeds == undefined) {\r",
+									"        t_vadditionalneeds = makeid(8);\r",
+									"        } else {\r",
+									"            t_vadditionalneeds = vadditionalneeds;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vgfirstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vglastname\", t_vlastname);\r",
+									"pm.globals.set(\"vgtotalprice\", t_vtotalprice);\r",
+									"pm.globals.set(\"vgdepositpaid\", t_vdepositpaid);\r",
+									"pm.globals.set(\"vgcheckin\", t_vcheckin);\r",
+									"pm.globals.set(\"vgcheckout\", t_vcheckout);\r",
+									"pm.globals.set(\"vgadditionalneeds\", t_vadditionalneeds);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.globals.set(\"vg4bookingid\", jsonData.bookingid);\r",
+									"pm.globals.set(\"vg4lastname\", jsonData.booking.lastname);\r",
+									"pm.globals.set(\"vg4firstname\", jsonData.booking.firstname);\r",
+									"pm.globals.set(\"vg4totalprice\", jsonData.booking.totalprice);\r",
+									"pm.globals.set(\"vg4depositpaid\", jsonData.booking.depositpaid);\r",
+									"pm.globals.set(\"vg4additionalneeds\", jsonData.booking.additionalneeds);\r",
+									"pm.globals.set(\"vg4checkin\", jsonData.booking.bookingdates.checkin);\r",
+									"pm.globals.set(\"vg4checkout\", jsonData.booking.bookingdates.checkout);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vgfirstname}}\",\r\n    \"lastname\" : \"{{vglastname}}\",\r\n    \"totalprice\" : 11,\r\n    \"depositpaid\" : {{vgdepositpaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{vgcheckin}}\",\r\n        \"checkout\" : \"{{vgcheckout}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{vgadditionalneeds}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "05_PartialUpdateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var vbookingid = pm.iterationData.get(\"04_vbookingid\");\r",
+									"var vfirstname = pm.iterationData.get(\"04_vfirstname\");\r",
+									"var vlastname = pm.iterationData.get(\"04_vlastname\");\r",
+									"\r",
+									"\r",
+									"function makeid(length) {\r",
+									"\tvar result = '';\r",
+									"\tvar characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+									"\tvar charactersLength = characters.length;\r",
+									"\tfor (var i = 0; i < length; i++) {\r",
+									"\t\tresult += characters.charAt(Math.floor(Math.random() *\r",
+									"\t\t\tcharactersLength));\r",
+									"\t}\r",
+									"\treturn result;\r",
+									"}\r",
+									"// bookingid\r",
+									"if (vbookingid == \"vacio\") {\r",
+									"\tt_bookingid = \"\";\r",
+									"    }else if (vbookingid == \"nulo\") {\r",
+									"        t_vbookingid= null;\r",
+									"     }else if (vbookingid == \"actualizado\") {\r",
+									"        t_vbookingid= pm.globals.get(\"vg4bookingid\");\r",
+									"    } else if (vbookingid == \"matiene valor\" || vbookingid == undefined) {\r",
+									"        t_vbookingid = pm.globals.get(\"vg4bookingid\");\r",
+									"        } else {\r",
+									"            t_vbookingid = vbookingid;\r",
+									"        }\r",
+									"\r",
+									"// firstname\r",
+									"if (vfirstname == \"vacio\") {\r",
+									"\tt_vfirstname = \"\";\r",
+									"    }else if (vfirstname == \"nulo\") {\r",
+									"        t_vfirstname = null;\r",
+									"    }else if (vfirstname == \"actualizado\") {\r",
+									"        t_vfirstname = makeid(8);\r",
+									"    }else if (vfirstname == \"matiene valor\" || vfirstname == undefined) {\r",
+									"        t_vfirstname = pm.globals.get(\"vg4firstname\");\r",
+									"        } else {\r",
+									"            t_vfirstname = vfirstname;\r",
+									"        }\r",
+									"\r",
+									"// lastname\r",
+									"if (vlastname == \"vacio\") {\r",
+									"\tt_vlastname = \"\";\r",
+									"    }else if (vlastname == \"nulo\") {\r",
+									"        t_vlastname = null;   \r",
+									"    }else if (vlastname == \"actualizado\") {\r",
+									"        t_vlastname = makeid(8);\r",
+									"    } else if (vlastname == \"matiene valor\" || vlastname == undefined) {\r",
+									"        t_vlastname =  pm.globals.get(\"vg4lastname\");\r",
+									"        } else {\r",
+									"            t_vlastname = vlastname;\r",
+									"        }\r",
+									"\r",
+									"//creación de variables\r",
+									"pm.globals.set(\"vg4_2bookingid\", t_vbookingid);\r",
+									"pm.globals.set(\"vg4_2firstname\", t_vfirstname);\r",
+									"pm.globals.set(\"vg4_2lastname\", t_vlastname);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var ptestCaseSuite= pm.iterationData.get(\"testSuite\");\r",
+									"var ptestCase= pm.iterationData.get(\"testCase\");\r",
+									"var pnro= pm.iterationData.get(\"nro\");\r",
+									"var pstatus= pm.iterationData.get(\"errorResponse_c4\");\r",
+									"\r",
+									"\r",
+									"pm.test(\"Test Case: \"+ptestCase, function (){});\r",
+									"const testsuite1 = 'flow';\r",
+									"\r",
+									"\r",
+									"if (ptestCaseSuite==testsuite1 ||  ptestCaseSuite==undefined){\r",
+									"\r",
+									"    //valid status\r",
+									"                pm.test(\"valid Status response:\" + pstatus, function () {\r",
+									"                    pm.response.to.have.status(pstatus);\r",
+									"                });\r",
+									"    if (pstatus=='200')\r",
+									"            {\r",
+									"                // valid bookingid\r",
+									"                 pm.test(\"Valid bookingid\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.bookingid).to.not.be.null;\r",
+									"                });\r",
+									"                // valid firstname\r",
+									"                pm.test(\"valid firstname\", function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.firstname).to.eql(''+pm.globals.get(\"vg4_2firstname\")+'');\r",
+									"                });\r",
+									"                 // valid lastname\r",
+									"                pm.test(\"valid lastname \"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.lastname).to.eql(''+pm.globals.get(\"vg4_2lastname\")+'');\r",
+									"                });\r",
+									"                // valid totalprice\r",
+									"                pm.test(\"valid totalprice\" , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.totalprice).to.eql(pm.globals.get(\"vg4_2totalprice\"));\r",
+									"                });\r",
+									"                // valid depositpaid\r",
+									"                pm.test(\"valid depositpaid\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    pm.expect(jsonData.depositpaid).to.eql(pm.globals.get(\"vg4_2depositpaid\"));\r",
+									"                });\r",
+									"\r",
+									"            // valid checkin\r",
+									"                pm.test(\"valid checkin\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckin\")==!('vacio')||pm.iterationData.get(\"01_vcheckin\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.bookingdates.checkin).to.eql(''+pm.globals.get(\"vg4_2checkin\")+'');}\r",
+									"                });\r",
+									"            // valid checkout\r",
+									"                pm.test(\"valid checkout\"  , function () {\r",
+									"                    var jsonData = pm.response.json();\r",
+									"                    if(pm.iterationData.get(\"01_vcheckout\")==!('vacio')||pm.iterationData.get(\"01_vcheckout\")==!('vacio')){\r",
+									"                    pm.expect(jsonData.bookingdates.checkout).to.eql(''+pm.globals.get(\"vg4_2checkout\")+'');}\r",
+									"                });\r",
+									"        \r",
+									"            }\r",
+									"    \r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Cookie",
+								"value": "abc123",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46cGFzc3dvcmQxMjM=",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"firstname\" : \"{{vg4_2firstname}}\",\r\n    \"lastname\" : \"{{vg4_2lastname}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/booking/{{vg4_2bookingid}}",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"booking",
+								"{{vg4_2bookingid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ping - HealthCheck",
+			"item": [
+				{
+					"name": "07_Ping - HealthCheck",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46cGFzc3dvcmQxMjM=",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://restful-booker.herokuapp.com/ping",
+							"protocol": "https",
+							"host": [
+								"restful-booker",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"ping"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
